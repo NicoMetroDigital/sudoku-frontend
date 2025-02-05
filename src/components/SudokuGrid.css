@@ -1,0 +1,11 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 5px;
+}
+input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2em;
+}

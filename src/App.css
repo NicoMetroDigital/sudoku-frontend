@@ -1,0 +1,40 @@
+.app {
+  text-align: center;
+}
+
+.app.light {
+  background-color: white;
+  color: black;
+}
+
+.app.dark {
+  background-color: black;
+  color: white;
+}
+
+.app.blue {
+  --primary-color: blue;
+}
+
+.app.yellow {
+  --primary-color: yellow;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+}
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
