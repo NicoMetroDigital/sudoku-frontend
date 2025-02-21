@@ -1,81 +1,97 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Cell from "./Cell";
-import "./components/SudokuGrid.css";
+import React, { useState } from "react";
+import { fetchNewSudoku } from "./services/SudokuService";
+import "./SudokuGrid.css";
 
 const SudokuGrid = () => {
-    const [grid, setGrid] = useState([]); // ✅ Sicherstellen, dass grid immer ein Array ist
-    const [loading, setLoading] = useState(true);
+    const [grid, setGrid] = useState(Array(9).fill(Array(9).fill(0)));
 
-    // Funktion zum Abrufen eines neuen Sudokus basierend auf der Schwierigkeit
-    const loadSudoku = async (difficulty = "easy") => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`http://localhost:8080/sudoku/new?difficulty=${difficulty}`, {
-                withCredentials: true,  // Falls Cookies benötigt werden
-            });
-            setGrid(response.data);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching Sudoku grid:", error);
-            setLoading(false);
+    // Sudoku laden
+    const loadSudoku = async (difficulty) => {
+        const newGrid = await fetchNewSudoku(difficulty);
+        if (newGrid) {
+            setGrid(newGrid);
+        } else {
+            console.error("Konnte Sudoku nicht laden!");
         }
     };
 
-    // Initiales Laden des Sudokus bei Komponentemount
-    useEffect(() => {
-        loadSudoku("easy"); // Beispiel: Standardmäßig "easy" laden
-    }, []);
+    // Funktion zum Überprüfen, ob eine Zahl erlaubt ist
+    const isValid = (grid, row, col, num) => {
+        for (let i = 0; i < 9; i++) {
+            if (grid[row][i] === num || grid[i][col] === num) {
+                return false;
+            }
+        }
 
-    // Handhabung der Zellenänderung
-    const handleCellChange = (row, col, value) => {
-        const updatedGrid = [...grid];
-        updatedGrid[row][col] = value;
-        setGrid(updatedGrid);
-    };
-
-    // Handhabung der Überprüfung des Sudokus
-    const handleSubmit = () => {
-        axios
-            .post("http://localhost:8080/sudoku/validate", grid, {
-                withCredentials: true, // Falls Cookies benötigt werden
-            })
-            .then((response) => {
-                if (response.data.valid) {
-                    alert("Congratulations! You solved the puzzle!");
-                } else {
-                    alert("There are errors in your solution.");
+        const startRow = Math.floor(row / 3) * 3;
+        const startCol = Math.floor(col / 3) * 3;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (grid[startRow + i][startCol + j] === num) {
+                    return false;
                 }
-            })
-            .catch((error) => {
-                console.error("Error validating Sudoku:", error);
-            });
+            }
+        }
+        return true;
     };
 
-    if (loading) {
-        return <p>Loading...</p>;
-    }
+    // Sudoku lösen mit Backtracking
+    const solve = (grid) => {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (grid[row][col] === 0) {
+                    for (let num = 1; num <= 9; num++) {
+                        if (isValid(grid, row, col, num)) {
+                            grid[row][col] = num;
+                            if (solve(grid)) {
+                                return true;
+                            }
+                            grid[row][col] = 0; // Backtrack
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    // Wrapper-Funktion für den Button
+    const solveSudoku = () => {
+        const gridCopy = grid.map((row) => [...row]); // Tiefenkopie des Arrays
+        if (solve(gridCopy)) {
+            setGrid(gridCopy);
+        } else {
+            console.error("Keine Lösung gefunden!");
+        }
+    };
 
     return (
-        <div>
+        <div className="sudoku-container">
+            <div className="buttons">
+                <button onClick={() => loadSudoku("easy")}>Load Easy Sudoku</button>
+                <button onClick={() => loadSudoku("medium")}>Load Medium Sudoku</button>
+                <button onClick={() => loadSudoku("hard")}>Load Hard Sudoku</button>
+                <button onClick={solveSudoku}>Solve Sudoku</button>
+            </div>
+
             <div className="sudoku-grid">
                 {grid.map((row, rowIndex) => (
-                    <div className="sudoku-row" key={rowIndex}>
-                        {row.map((cell, colIndex) => (
-                            <Cell
-                                key={`${rowIndex}-${colIndex}`}
-                                value={cell}
-                                row={rowIndex}
-                                col={colIndex}
-                                onChange={handleCellChange}
+                    <div key={rowIndex} className="sudoku-row">
+                        {row.map((cell, cellIndex) => (
+                            <input
+                                key={cellIndex}
+                                type="text"
+                                className={`sudoku-cell ${
+                                    (rowIndex + 1) % 3 === 0 ? "border-bottom" : ""
+                                } ${(cellIndex + 1) % 3 === 0 ? "border-right" : ""}`}
+                                value={cell !== 0 ? cell : ""}
+                                readOnly
                             />
                         ))}
                     </div>
                 ))}
             </div>
-            <button className="submit-button" onClick={handleSubmit}>
-                Submit
-            </button>
         </div>
     );
 };
