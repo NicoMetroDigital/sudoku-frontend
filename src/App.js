@@ -43,12 +43,13 @@ const SudokuGrid = () => {
 
     return (
         <div>
-            <div>
-                <button onClick={() => loadSudoku("easy")}>Load Easy Sudoku</button>
-                <button onClick={() => loadSudoku("medium")}>Load Medium Sudoku</button>
-                <button onClick={() => loadSudoku("hard")}>Load Hard Sudoku</button>
-                <button onClick={solveCurrentSudoku}>Solve Sudoku</button>
+            <div className="buttons">
+                <button className="button easy" onClick={() => loadSudoku("easy")}>Load Easy</button>
+                <button className="button medium" onClick={() => loadSudoku("medium")}>Load Medium</button>
+                <button className="button hard" onClick={() => loadSudoku("hard")}>Load Hard</button>
+                <button className="button solve" onClick={solveCurrentSudoku}>Solve Sudoku</button>
             </div>
+
 
             {/* 🔹 Sudoku Feld mit 9x9 Grid */}
             <div className="sudoku-container">

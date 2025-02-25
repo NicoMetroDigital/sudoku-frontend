@@ -1,19 +1,63 @@
+body {
+    display: flex;
+    justify-content: center; /* Horizontal zentrieren */
+    align-items: center; /* Vertikal zentrieren */
+    height: 100vh; /* Volle Höhe des Viewports */
+    margin: 0; /* Standardmargin entfernen */
+}
+
 .sudoku-container {
     text-align: center;
-    margin-top: 20px;
 }
 
 .buttons {
     margin-bottom: 20px;
+    display: flex; /* Damit die Buttons in einer Reihe sind */
+    justify-content: center; /* Zentriert die Buttons */
 }
 
+.button {
+    color: white; /* Textfarbe */
+    border: none; /* Keine Standardrahmen */
+    border-radius: 5px; /* Abgerundete Ecken */
+    padding: 15px 30px; /* Innenabstand erhöhen */
+    font-size: 18px; /* Schriftgröße erhöhen */
+    cursor: pointer; /* Handzeiger beim Hover */
+    transition: background-color 0.3s, transform 0.2s; /* Sanfter Übergang bei Hover */
+    margin: 0 10px; /* Abstand zwischen den Buttons */
+}
+
+.easy {
+    background-color: #28a745; /* Grüner Button für leicht */
+}
+
+.medium {
+    background-color: #ff8c00; /* Orangefarbener Button für mittel */
+}
+
+.hard {
+    background-color: #dc3545; /* Roter Button für schwer */
+}
+.solve{
+    background-color: #000000;
+}
+
+.button:hover {
+    opacity: 0.9; /* Weniger transparent beim Hover */
+    transform: scale(1.1); /* Stärker vergrößern beim Hover */
+}
+
+.button:active {
+    transform: scale(0.95); /* Kleinere Verkleinerung beim Klicken */
+}
+
+/* Hier wird die Größe des Grids und der Zellen angepasst */
 .sudoku-grid {
     display: grid;
-    grid-template-rows: repeat(9, 40px);
+    grid-template-rows: repeat(9, 60px); /* Zellenhöhe auf 60px erhöhen */
     gap: 0;
     border: 2px solid black;
-    width: 360px;
-    margin: auto;
+    width: 540px; /* Breite auf 540px erhöhen */
 }
 
 .sudoku-row {
@@ -21,13 +65,19 @@
 }
 
 .sudoku-cell {
-    width: 40px;
-    height: 40px;
+    width: 90px; /* Zellenbreite auf 90px erhöhen */
+    height: 90px; /* Zellenhöhe auf 90px erhöhen */
     text-align: center;
-    font-size: 18px;
+    font-size: 30px; /* Schriftgröße erhöhen */
     border: 1px solid lightgray;
     outline: none;
     background-color: white;
+}
+
+.sudoku-cell.preset {
+    background-color: #d3d3d3 !important; /* Dunkelgrau für vorgegebene Zahlen */
+    font-weight: bold;
+    pointer-events: none; /* Verhindert Änderungen an vorgegebenen Zahlen */
 }
 
 .sudoku-cell.border-right {
