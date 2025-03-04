@@ -69,7 +69,7 @@ body {
     height: 90px; /* Zellenhöhe auf 90px erhöhen */
     text-align: center;
     font-size: 30px; /* Schriftgröße erhöhen */
-    border: 1px solid lightgray;
+    border: 2px solid lightgray;
     outline: none;
     background-color: white;
 }

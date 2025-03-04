@@ -1,22 +1,23 @@
-# Basis-Image mit Node.js
-FROM node:18-alpine
+# Basis-Image für Node.js (zum Bauen)
+FROM node:18 AS build
 
 # Setze das Arbeitsverzeichnis
 WORKDIR /app
 
-# Kopiere alle Dateien ins Image
-COPY . .
-
-# Installiere Abhängigkeiten
+# Kopiere die Package-Dateien und installiere Abhängigkeiten
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Baue die App
+# Kopiere den restlichen Code und baue das Projekt
+COPY . .
 RUN npm run build
 
-# Nutze Nginx als Webserver
+# Neues Image für die Laufzeit (Nginx als Webserver)
 FROM nginx:alpine
-COPY --from=0 /app/build /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Port freigeben
+# Exponiere den Port
 EXPOSE 80
+
+# Starte Nginx
 CMD ["nginx", "-g", "daemon off;"]

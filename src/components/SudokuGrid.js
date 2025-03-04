@@ -24,7 +24,6 @@ const SudokuGrid = () => {
             const formattedGrid = formatGrid(newGrid);
             if (formattedGrid) {
                 setGrid(formattedGrid);
-                // Speichere die Positionen der vorgegebenen Zahlen
                 setInitialGrid(formattedGrid.map((row, rowIndex) =>
                     row.map((cell, cellIndex) => presetPositions.some(pos => pos[0] === rowIndex && pos[1] === cellIndex) ? cell : null)
                 ));
