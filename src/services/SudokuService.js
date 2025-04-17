@@ -1,39 +1,22 @@
-const API_URL = "http://localhost:8080/sudoku"; // Basis-URL für alle API-Anfragen
+// Dynamische Basis-URL: zuerst .env prüfen, dann hostname-Check
+const API_HOST =
+    process.env.REACT_APP_BACKEND_URL ||
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://localhost:8080"
+        : "http://sudoku:8080");
 
-// 🟢 Funktion zum Abrufen des Authentifizierungs-Tokens (falls benötigt)
+const API_URL = `${API_HOST}/sudoku`;
+
+// 🔐 Auth-Header (optional)
 const getAuthHeaders = () => {
-    const token = localStorage.getItem("authToken"); // Falls ein Token gespeichert wird
+    const token = localStorage.getItem("authToken");
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-// 🟢 Holt ein Sudoku-Board mit einem bestimmten Schwierigkeitsgrad
+// 🟢 Neues Sudoku anfordern
 export const fetchNewSudoku = async (difficulty = "easy") => {
     try {
-        const response = await fetch(`${API_URL}/new?difficulty=${difficulty}`, { // "/new" ist der richtige Endpunkt
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                ...getAuthHeaders(),
-            },
-            credentials: "include", // Falls Cookies für Authentifizierung genutzt werden
-        });
-
-        if (!response.ok) {
-            throw new Error(`Fehler: ${response.status} - ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log("Sudoku geladen:", data);  // Logge die Antwort zum Debuggen
-        return data;  // Gibt das Sudoku-Grid zurück
-    } catch (error) {
-        console.error("fetchNewSudoku Fehler:", error);
-        return null;  // Gibt null zurück, wenn es einen Fehler gibt
-    }
-};
-
-// 🟢 Holt ein zufälliges Sudoku-Board ohne Schwierigkeitsgrad-Filter
-export const getSudokuBoard = async () => {
-    try {
-        const response = await fetch(`${API_URL}`, { // Der Endpunkt für das Abrufen eines zufälligen Sudoku-Boards
+        const response = await fetch(`${API_URL}/new?difficulty=${difficulty}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -46,35 +29,59 @@ export const getSudokuBoard = async () => {
             throw new Error(`Fehler: ${response.status} - ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("Zufälliges Sudoku geladen:", data);  // Logge die Antwort zum Debuggen
-        return data;  // Gibt das Sudoku-Grid zurück
+        console.log("Sudoku geladen:", data);
+        return data;
     } catch (error) {
-        console.error("getSudokuBoard Fehler:", error);
-        return null;  // Gibt null zurück, wenn es einen Fehler gibt
+        console.error("fetchNewSudoku Fehler:", error);
+        return null;
     }
 };
 
-// 🟢 Sendet ein Sudoku-Board zum Lösen an das Backend
+// 🟢 Zufälliges Sudoku holen
+export const getSudokuBoard = async () => {
+    try {
+        const response = await fetch(`${API_URL}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                ...getAuthHeaders(),
+            },
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            throw new Error(`Fehler: ${response.status} - ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("Zufälliges Sudoku geladen:", data);
+        return data;
+    } catch (error) {
+        console.error("getSudokuBoard Fehler:", error);
+        return null;
+    }
+};
+
+// 🟢 Sudoku lösen
 export const solveSudoku = async (board) => {
     try {
-        const response = await fetch(`${API_URL}/solve`, { // Der Endpunkt zum Lösen eines Sudoku-Boards
+        const response = await fetch(`${API_URL}/solve`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 ...getAuthHeaders(),
             },
             credentials: "include",
-            body: JSON.stringify({ grid: board }), // "grid" ist der Parameter, den das Backend erwartet
+            body: JSON.stringify({ grid: board }),
         });
 
         if (!response.ok) {
             throw new Error(`Fehler: ${response.status} - ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("Gelöstes Sudoku:", data);  // Logge die Antwort zum Debuggen
-        return data;  // Gibt das gelöste Sudoku zurück
+        console.log("Gelöstes Sudoku:", data);
+        return data;
     } catch (error) {
         console.error("solveSudoku Fehler:", error);
-        return null;  // Gibt null zurück, wenn es einen Fehler gibt
+        return null;
     }
 };
