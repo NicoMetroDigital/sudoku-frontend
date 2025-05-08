@@ -1,11 +1,6 @@
-// Dynamische Basis-URL: zuerst .env prüfen, dann hostname-Check
-const API_HOST =
-    process.env.REACT_APP_BACKEND_URL ||
-    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-        ? "http://localhost:8080"
-        : "http://sudoku:8080");
-
-const API_URL = `${API_HOST}/sudoku`;
+// ✅ Basis-URL über .env oder fallback auf localhost
+const API_HOST = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+const API_URL = `${API_HOST}`; // <-- /sudoku entfernt
 
 // 🔐 Auth-Header (optional)
 const getAuthHeaders = () => {
@@ -16,7 +11,7 @@ const getAuthHeaders = () => {
 // 🟢 Neues Sudoku anfordern
 export const fetchNewSudoku = async (difficulty = "easy") => {
     try {
-        const response = await fetch(`${API_URL}/new?difficulty=${difficulty}`, {
+        const response = await fetch(`${API_URL}/api/sudoku/generate/${difficulty}`, {  // Route geändert
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -40,7 +35,7 @@ export const fetchNewSudoku = async (difficulty = "easy") => {
 // 🟢 Zufälliges Sudoku holen
 export const getSudokuBoard = async () => {
     try {
-        const response = await fetch(`${API_URL}`, {
+        const response = await fetch(`${API_URL}/api/sudoku`, {  // Route geändert
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -64,7 +59,7 @@ export const getSudokuBoard = async () => {
 // 🟢 Sudoku lösen
 export const solveSudoku = async (board) => {
     try {
-        const response = await fetch(`${API_URL}/solve`, {
+        const response = await fetch(`${API_URL}/api/sudoku/solve`, {  // Route geändert
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
